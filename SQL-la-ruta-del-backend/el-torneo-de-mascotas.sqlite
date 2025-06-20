@@ -1,0 +1,9 @@
+SELECT
+  mascota.nombre AS mascota,
+  dn.nombre AS dueño
+FROM
+  dueños AS dn
+  INNER JOIN mascotas AS mascota ON mascota.mascota_id = dn.dueno_id
+WHERE
+  mascota.nombre like 'P%'
+  AND mascota.edad BETWEEN 2 AND 5
