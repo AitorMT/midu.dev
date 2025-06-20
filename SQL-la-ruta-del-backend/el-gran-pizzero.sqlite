@@ -1,0 +1,10 @@
+SELECT
+  cl.nombre,
+  ped.fecha_pedido
+FROM
+  clientes AS cl
+  INNER JOIN pedidos AS ped ON ped.cliente_id = cl.cliente_id
+ORDER BY
+  fecha_pedido DESC
+LIMIT
+  5
