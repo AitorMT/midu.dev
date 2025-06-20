@@ -1,0 +1,6 @@
+SELECT DISTINCT
+  tipo AS categorias
+FROM
+  postres
+ORDER BY
+  tipo ASC;
