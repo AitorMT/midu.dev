@@ -1,0 +1,13 @@
+SELECT
+  titulo,
+  artista
+FROM
+  obras_arte
+WHERE
+  anio_exposicion BETWEEN 1500 AND 2000
+ORDER BY
+  anio_exposicion DESC
+LIMIT
+  5
+OFFSET
+  5;
