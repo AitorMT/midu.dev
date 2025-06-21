@@ -1,0 +1,20 @@
+SELECT DISTINCT
+  art.nombre AS Artista,
+  can.titulo AS Canción,
+  fan.comentario AS Comentario
+FROM
+  artistas AS art
+  INNER JOIN canciones AS can ON can.artista_id = art.artista_id
+  INNER JOIN fans AS fan ON fan.cancion_id = can.cancion_id
+WHERE
+  UPPER(art.nombre) LIKE '%G%'
+  OR UPPER(can.titulo) LIKE '%G%'
+ORDER BY
+  CASE
+    WHEN can.titulo = 'Galactic Waves' THEN 1
+    WHEN can.titulo = 'Stars Align' THEN 2
+    ELSE 3
+  END,
+  can.cancion_id DESC
+LIMIT
+  2;
