@@ -1,0 +1,108 @@
+WITH
+  jugadores_con_hattrick AS (
+    SELECT
+      jugador_id,
+      COUNT(*) AS cantidad_hattricks
+    FROM
+      partidos_jugadores
+    WHERE
+      goles >= 3
+    GROUP BY
+      jugador_id
+  ),
+  jugadores_en_equipos_top AS (
+    SELECT
+      je.jugador_id,
+      e.nombre AS equipo,
+      e.posicion_liga
+    FROM
+      jugadores_equipos je
+      JOIN equipos e ON je.equipo_id = e.id
+    WHERE
+      e.posicion_liga <= 8
+  ),
+  estadisticas_jugadores AS (
+    SELECT
+      j.id,
+      j.nombre,
+      j.edad,
+      SUM(pj.goles) AS goles_totales,
+      COUNT(DISTINCT pj.partido_id) AS partidos_jugados,
+      ROUND(
+        SUM(pj.goles) * 1.0 / COUNT(DISTINCT pj.partido_id),
+        1
+      ) AS promedio_goles
+    FROM
+      jugadores j
+      JOIN partidos_jugadores pj ON j.id = pj.jugador_id
+    GROUP BY
+      j.id,
+      j.nombre,
+      j.edad
+    HAVING
+      COUNT(DISTINCT pj.partido_id) > 2 --Más de 2 partidos
+  )
+SELECT
+  ej.nombre,
+  jh.cantidad_hattricks AS hat_trick,
+  ej.promedio_goles,
+  ej.edad,
+  jet.equipo AS nombre_equipo,
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      titulos_personales tp
+    WHERE
+      tp.jugador_id = ej.id
+      AND tp.fecha BETWEEN (
+        SELECT
+          fecha_inicio
+        FROM
+          jugadores_equipos
+        WHERE
+          jugador_id = ej.id
+        LIMIT
+          1
+      ) AND COALESCE(
+        (
+          SELECT
+            fecha_fin
+          FROM
+            jugadores_equipos
+          WHERE
+            jugador_id = ej.id
+          LIMIT
+            1
+        ),
+        '9999-12-31'
+      )
+  ) AS titulos_personales,
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      titulos_equipos te
+    WHERE
+      te.equipo_id = (
+        SELECT
+          equipo_id
+        FROM
+          jugadores_equipos
+        WHERE
+          jugador_id = ej.id
+        LIMIT
+          1
+      )
+  ) AS titulos_equipo
+FROM
+  estadisticas_jugadores ej
+  JOIN jugadores_con_hattrick jh ON ej.id = jh.jugador_id
+  JOIN jugadores_en_equipos_top jet ON ej.id = jet.jugador_id
+WHERE
+  ej.edad BETWEEN 18 AND 20
+  AND ej.promedio_goles >= 1.5
+ORDER BY
+  ej.promedio_goles DESC
+LIMIT
+  5;
