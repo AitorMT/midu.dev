@@ -1,0 +1,13 @@
+SELECT
+  pl.nombre AS piloto,
+  nav.modelo AS nave,
+  comp.tiempo AS tiempo
+FROM
+  pilotos AS pl
+  INNER JOIN competencias AS comp ON comp.piloto_id = pl.piloto_id
+  INNER JOIN naves AS nav ON nav.nave_id = comp.nave_id
+WHERE
+  CAST(comp.fecha_competencia AS YEAR) BETWEEN 2020 AND 2025
+  AND nav.velocidad_maxima > 200
+ORDER BY
+  comp.tiempo ASC;

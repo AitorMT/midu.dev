@@ -1,0 +1,11 @@
+SELECT
+  departamento,
+  COUNT(*) AS total_empleados,
+  ROUND(AVG(anos_trabajando), 1) AS promedio_anos
+FROM
+  empleados
+GROUP BY
+  departamento
+HAVING
+  promedio_anos >= 4
+  AND total_empleados > 3;

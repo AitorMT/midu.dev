@@ -1,0 +1,8 @@
+SELECT
+  l.titulo AS Libro,
+  NULL AS Lector
+FROM
+  libros l
+  LEFT JOIN prestamos p ON l.libro_id = p.libro_id
+WHERE
+  p.libro_id IS NULL;

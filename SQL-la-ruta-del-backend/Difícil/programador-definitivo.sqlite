@@ -1,0 +1,55 @@
+SELECT
+  p.nombre,
+  p.edad,
+  p.pais,
+  e.nombre AS equipo,
+  COUNT(
+    DISTINCT CASE
+      WHEN pc.ranking <= 3 THEN pc.competicion_id
+    END
+  ) AS podio_en_competiciones,
+  (
+    SELECT
+      GROUP_CONCAT(sub_lp.nombre, ', ')
+    FROM
+      (
+        SELECT DISTINCT
+          lp_inner.nombre
+        FROM
+          programadores_lenguajes pl_inner
+          JOIN lenguajes_programacion lp_inner ON pl_inner.lenguaje_id = lp_inner.lenguaje_id
+        WHERE
+          pl_inner.programador_id = p.programador_id
+          AND pl_inner.nivel >= 5
+      ) AS sub_lp
+  ) AS lenguajes_dominados
+FROM
+  programadores p
+  --Equipos
+  JOIN programadores_equipos pe ON p.programador_id = pe.programador_id
+  JOIN equipos e ON pe.equipo_id = e.equipo_id
+  AND e.ranking_mundial <= 5
+  --Competiciones
+  JOIN programadores_competiciones pc ON p.programador_id = pc.programador_id
+WHERE
+  p.edad < 30
+  AND p.experiencia_anios > 5
+  AND (
+    SELECT
+      COUNT(*)
+    FROM
+      programadores_competiciones sub_pc
+    WHERE
+      sub_pc.programador_id = p.programador_id
+  ) >= 2
+  AND EXISTS (
+    SELECT
+      1
+    FROM
+      programadores_competiciones sub_pc2
+    WHERE
+      sub_pc2.programador_id = p.programador_id
+      AND sub_pc2.ranking <= 3
+  )
+GROUP BY
+  p.programador_id;
